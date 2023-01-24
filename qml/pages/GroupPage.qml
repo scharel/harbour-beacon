@@ -5,24 +5,8 @@ import harbour.beacon 1.0
 Page {
     id: page
 
-    property var grouped_light_id
-
     property var grouped_light
-    property var group
-
-    Component.onCompleted: {
-        grouped_light = bridge.resource(HueBridge.ResourceGroupedLight, grouped_light_id)
-        switch (grouped_light.data.owner.rtype) {
-        case "room":
-            //bridge.getResource(HueBridge.ResourceRoom, grouped_light.owner.rid)
-            group = bridge.resource(HueBridge.ResourceRoom, grouped_light.data.owner.rid)
-            break
-        case "zone":
-            //bridge.getResource(HueBridge.ResourceZone, grouped_light.owner.rid)
-            group = bridge.resource(HueBridge.ResourceZone, grouped_light.data.owner.rid)
-            break;
-        }
-    }
+    property var group_owner
 
     SilicaFlickable {
         anchors.fill: parent
@@ -40,13 +24,13 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     //anchors.left: pageHeader.extraContent.left
                     anchors.right: groupIcon.left
-                    //icon.source: "../HueIconPack2019/" + archetypeImages[group.data.metadata.archetype]
+                    //icon.source: "../HueIconPack2019/" + archetypeImages[group_owner.rdata.metadata.archetype]
                     automaticCheck: false
-                    checked: grouped_light.data.on.on
+                    checked: grouped_light.rdata.on.on
                     onCheckedChanged: busy = false
                     onClicked: {
                         busy = true
-                        bridge.putResource(HueBridge.ResourceGroupedLight, { on: { on: !grouped_light.data.on.on } }, grouped_light.id)
+                        bridge.putResource(HueBridge.ResourceGroupedLight, { on: { on: !grouped_light.rdata.on.on } }, grouped_light.id)
                     }
                 }
                 Icon {
@@ -56,9 +40,9 @@ Page {
                     anchors.rightMargin: Theme.paddingSmall
                     width: Theme.iconSizeSmall
                     height: Theme.iconSizeSmall
-                    source: "../HueIconPack2019/" + archetypeImages[group.data.metadata.archetype]
+                    source: "../HueIconPack2019/" + roomArchetypeImages[group_owner.rdata.metadata.archetype]
                 }
-                title: group.data.metadata.name
+                title: group_owner.rdata.metadata.name
             }
 
 
@@ -66,15 +50,15 @@ Page {
                 id: groupSlider
                 anchors.left: parent.left
                 anchors.right: parent.right
-                handleVisible: down || grouped_light.data.on.on
+                handleVisible: down || grouped_light.rdata.on.on
                 minimumValue: 0
                 maximumValue: 100
                 stepSize: 1
-                value: grouped_light ? grouped_light.data.dimming ? grouped_light.data.dimming.brightness : 0 : 0
+                value: grouped_light ? grouped_light.rdata.dimming ? grouped_light.rdata.dimming.brightness : 0 : 0
                 valueText: value.toFixed() + "%"
                 onSliderValueChanged: {
                     if (down) {
-                        bridge.setGroup(grouped_light.id, { on: { on: true }, dimming: { brightness: sliderValue } })
+                        bridge.setGroup(grouped_light.rid, { on: { on: true }, dimming: { brightness: sliderValue } })
                     }
                 }
             }
@@ -89,6 +73,7 @@ Page {
                 text: qsTr("Scenes")
             }
             ComboBox {
+                id: sceneComboBox
                 width: parent.width
                 label: qsTr("Scene")
                 currentIndex: -1
@@ -97,8 +82,8 @@ Page {
                         model: bridge.resourceModel(HueBridge.ResourceScene)
                         delegate: MenuItem {
                             text: resource.metadata.name
-                            visible: resource.group.rid === group.id
-                            onClicked: bridge.putResource(HueBridge.ResourceScene, { target: { rid: group.id }, action: { on: { on: true } } }, resource.id)
+                            visible: resource.group.rtype === group_owner.rtype && resource.group.rid === group_owner.rid
+                            onClicked: bridge.putResource(HueBridge.ResourceScene, { target: { rid: group_owner.rid }, action: { on: { on: true } } }, resource.rid)
                         }
                     }
                 }
@@ -107,6 +92,19 @@ Page {
             SectionHeader {
                 id: ligtsHeader
                 text: qsTr("Lights")
+            }
+            Repeater {
+                model: group_owner.rdata.children
+                delegate: Label {
+                    property string rid: group_owner.rdata.children[index].rid
+                    property string rtype: group_owner.rdata.children[index].rtype
+                    property ResourceObject device: bridge.resource(HueBridge.ResourceDevice, rid)
+                    x: Theme.horizontalPageMargin
+                    width: page.width - 2*x
+                    visible: rtype === "device"
+                    color: Theme.secondaryColor
+                    text: device.rdata.metadata.name
+                }
             }
         }
     }

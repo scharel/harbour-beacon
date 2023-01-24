@@ -35,6 +35,7 @@ HEADERS += \
 
 DISTFILES += qml/harbour-beacon.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/AboutPage.qml \
     qml/pages/AddBridgeDialog.qml \
     qml/pages/BridgesPage.qml \
     qml/pages/ConnectBridgePage.qml \
@@ -43,6 +44,7 @@ DISTFILES += qml/harbour-beacon.qml \
     qml/pages/DevicesPage.qml \
     qml/pages/GroupPage.qml \
     qml/pages/HomePage.qml \
+    qml/pages/SettingsPage.qml \
     rpm/harbour-beacon.changes.in \
     rpm/harbour-beacon.changes.run.in \
     rpm/harbour-beacon.spec \

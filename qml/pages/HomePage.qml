@@ -10,11 +10,11 @@ Page {
     property ResourceModel groupModel: bridge.resourceModel(HueBridge.ResourceGroupedLight)
 
     onGroupModelChanged: {
-        groupModel.dynamicSortFilter = true
+        groupModel.dynamicSortFilter = false
         groupModel.sortRole = ResourceModel.RidRole
         groupModel.resourceOrder = appSettings.groupOrder
         groupModel.favoritePath = ["owner", "rtype"]
-        groupModel.favoriteRegExp = appSettings.groupSorting
+        groupModel.favoriteRegExp = /^room$/ //appSettings.groupSorting
         groupModel.filterPath = ["owner", "rtype"]
         groupModel.filterRegExp = /^(room|zone)$/
         groupModel.sectionPath = ["owner", "rtype"]
@@ -39,12 +39,8 @@ Page {
         PullDownMenu {
             busy: bridge == null ? false : bridge.busy
             MenuItem {
-                text: qsTr("Devices")
-                onClicked: pageStack.push(Qt.resolvedUrl("DevicesPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Bridges")
-                onClicked: pageStack.push(Qt.resolvedUrl("BridgesPage.qml"))
+                text: qsTr("Settings")
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
         }
 
@@ -73,23 +69,23 @@ Page {
 
             property var groupId: rid
             property var ownerId: resource.owner.rid
+            property var groupOwner: null
 
             onGroupIdChanged: {
-                var groupObject = null
                 switch (resource.owner.rtype) {
                 case "room":
-                    groupObject = bridge.resource(HueBridge.ResourceRoom, resource.owner.rid)
+                    groupOwner = bridge.resource(HueBridge.ResourceRoom, resource.owner.rid)
                     break
                 case "zone":
-                    groupObject = bridge.resource(HueBridge.ResourceZone, resource.owner.rid)
+                    groupOwner = bridge.resource(HueBridge.ResourceZone, resource.owner.rid)
                     break
                 }
-                if (groupObject !== null) {
-                    groupIcon.source = "../HueIconPack2019/" + roomArchetypeImages[groupObject.rdata.metadata.archetype]
-                    groupLabel.text = groupObject.rdata.metadata.name
+                if (groupOwner !== null) {
+                    groupIcon.source = "../HueIconPack2019/" + roomArchetypeImages[groupOwner.rdata.metadata.archetype]
+                    groupLabel.text = groupOwner.rdata.metadata.name
                     groupIdLabel.text = rid
                     ownerId = resource.owner.rid
-                    //console.log(rid, groupObject.rdata.metadata.name)
+                    //console.log(rid, groupOwner.rdata.metadata.name)
                 }
             }
 
@@ -97,7 +93,7 @@ Page {
             //onRidChanged: getResourceObject()
 
             onClicked: {
-                pageStack.push(Qt.resolvedUrl("GroupPage.qml"),  { grouped_light_id: rid} )
+                pageStack.push(Qt.resolvedUrl("GroupPage.qml"),  { grouped_light: bridge.resource(HueBridge.ResourceGroupedLight, rid), group_owner: groupOwner } )
             }
             onPressAndHold: {
                 if (typeof(resource.dimming) !== "undefined") {
