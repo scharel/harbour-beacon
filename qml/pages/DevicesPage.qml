@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
 
@@ -43,9 +43,10 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.horizontalPageMargin
-                width: Theme.iconSizeMedium
-                height: Theme.iconSizeMedium
-                source: resource.product_data.product_archetype !== "unknown_archetype" ?  "../HueIconPack2019/" + deviceArchetypeImages[resource.product_data.product_archetype] : "image://theme/icon-m-question"
+                sourceSize.width: Theme.iconSizeMedium
+                sourceSize.height: Theme.iconSizeMedium
+                source: resource.product_data.product_archetype !== "unknown_archetype" ?  "../hueiconpack/HueIconPack2019/" + deviceArchetypeImages[resource.product_data.product_archetype] : "image://theme/icon-m-question"
+                //source: "../hueiconpack/ApiV2Archetype/" + resource.product_data.product_archetype + ".svg"
             }
             Label {
                 id: nameLabel

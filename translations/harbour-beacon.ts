@@ -11,11 +11,7 @@
 <context>
     <name>BridgesPage</name>
     <message>
-        <source>Discover bridges</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pull down to add bridges</source>
+        <source>Clear list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -23,7 +19,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Searching Bridges</source>
+        <source>Discover bridges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -32,6 +28,10 @@
     </message>
     <message>
         <source>No Hue Bridges found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pull down to add bridges</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -114,20 +114,28 @@
 <context>
     <name>GroupPage</name>
     <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Scenes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select scene</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Lights</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Scene</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>HomePage</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Home</source>
         <translation type="unfinished"></translation>
@@ -160,8 +168,15 @@
         <source>Zones</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>LightPage</name>
     <message>
-        <source>Settings</source>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identify</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -97,20 +97,16 @@ int HueDiscovery::discover(const QString& query, int pollInterval) {
 }
 
 void HueDiscovery::clearBridges(const QList<int> &keep) {
-    int removedBridges = 0;
+    qDebug() << keep;
     emit beginResetModel();
     abortDiscovery();
     for (int i = m_pendingBridges.size()-1; i >= 0; --i) {
         if (!keep.contains(i)) {
             delete m_pendingBridges[i];
             m_pendingBridges.removeAt(i);
-            removedBridges++;
         }
     }
     emit endResetModel();
-    if (removedBridges > 0) {
-        emit countChanged(m_pendingBridges.count());
-    }
 }
 
 void HueDiscovery::abortDiscovery() {
@@ -156,7 +152,7 @@ int HueDiscovery::recvCallback(int sock, const struct sockaddr *from, size_t add
     QByteArray service(entrystr.str, entrystr.length);
     //qDebug() << service;
 
-    QRegExp rx(QString("^Philips Hue - [A-F0-9]{6}.%1$").arg(QString(HUE_MDNS)));
+    QRegExp rx(QString("^.* - [A-F0-9]{6}.%1$").arg(QString(HUE_MDNS)));
     if (rx.exactMatch(service)) {
         if (rtype == MDNS_RECORDTYPE_TXT) {
             //qDebug() << "TXT received";

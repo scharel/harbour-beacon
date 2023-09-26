@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import harbour.beacon 1.0
@@ -6,15 +6,30 @@ import "pages"
 
 ApplicationWindow {
     id: app
-    initialPage: Component { BridgesPage { } }
+    initialPage: Component { BridgesPage { appStart: true } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 
     property HueBridge bridge: null
+    onBridgeChanged: {
+        if (bridge != null) {
+            bridgeConfig.path = appSettings.path + "/bridges/" + bridge.bridgeid
+            bridgeConfig.sync()
+            bridge.username = bridgeConfig.username
+            bridge.startEventStream()
+            appSettings.lastUsedBridge = bridge.bridgeid
+            pageStack.replaceAbove(null, Qt.resolvedUrl("pages/HomePage.qml"))
+        }
+        else {
+            bridgeConfig.path = ""
+            bridgeConfig.clear()
+        }
+    }
 
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-beacon"
+        property string lastUsedBridge: value("lastUsedBridge", "", String)
         property var groupSorting: value("groupSorting", /^room$/, RegExp)
         property var groupOrder: value("groupOrder", Array(), Array)
     }

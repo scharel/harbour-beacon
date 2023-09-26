@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
 
@@ -37,7 +37,7 @@ Page {
         //spacing: Theme.paddingMedium
 
         PullDownMenu {
-            busy: bridge == null ? false : bridge.busy
+            busy: bridge === null ? false : bridge.busy
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
@@ -46,19 +46,29 @@ Page {
 
         header: PageHeader {
             title: qsTr("Home")
+            description: debug ? homeGroup.rid : ""
             Switch {
                 id: homeSwitch
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.extraContent.left
                 visible: bridge != null
                 enabled: homeGroup != null
                 automaticCheck: false
-                checked: homeGroup != null && typeof(homeGroup.data) !== "undefined" && typeof(homeGroup.data.on) !== "undefined" ? homeGroup.data.on.on : false
+                checked: homeGroup.rdata.on.on   //homeGroup != null && typeof(homeGroup.data) !== "undefined" && typeof(homeGroup.data.on) !== "undefined" ? homeGroup.data.on.on : false
                 onCheckedChanged: busy = false
                 onClicked: {
                     busy = true
-                    bridge.setGroup(homeGroup.id, { on: { on: !homeGroup.data.on.on } })
+                    bridge.setGroup(homeGroup.rid, { on: { on: !homeGroup.rdata.on.on } })
                 }
             }
+//            Icon {
+//                anchors.verticalCenter: parent.verticalCenter
+//                anchors.right: parent.extraContent.right
+//                anchors.rightMargin: Theme.paddingMedium
+//                opacity: bridge.stream ? 1.0 : 0.0
+//                Behavior on opacity { FadeAnimator {} }
+//                source: "image://theme/icon-m-link"
+//            }
         }
 
         delegate: ListItem {
@@ -81,7 +91,8 @@ Page {
                     break
                 }
                 if (groupOwner !== null) {
-                    groupIcon.source = "../HueIconPack2019/" + roomArchetypeImages[groupOwner.rdata.metadata.archetype]
+                    groupIcon.source = "../hueiconpack/HueIconPack2019/" + roomArchetypeImages[groupOwner.rdata.metadata.archetype]
+                    //groupIcon.source = "../hueiconpack/ApiV2Archetype/" + groupOwner.rdata.metadata.archetype + ".svg"
                     groupLabel.text = groupOwner.rdata.metadata.name
                     groupIdLabel.text = rid
                     ownerId = resource.owner.rid
@@ -118,8 +129,8 @@ Page {
                 id: groupIcon
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: onSwitch.right
-                width: Theme.iconSizeSmall
-                height: Theme.iconSizeSmall
+                sourceSize.width: Theme.iconSizeSmall
+                sourceSize.height: Theme.iconSizeSmall
             }
             Label {
                 id: groupLabel

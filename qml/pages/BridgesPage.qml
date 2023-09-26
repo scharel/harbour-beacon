@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import harbour.beacon 1.0
@@ -6,45 +6,56 @@ import harbour.beacon 1.0
 Page {
     id: page
 
+    property bool appStart: false
     property int hueMinVersion: 1948086000
-    property int numAuthBridges: 0
-    signal setBridge()
+    property int hueRelVersion: 1955082050
+    //property int numAuthBridges: 0
+    //signal setBridge()
 
     Timer {
         id: discoverTimer
         repeat: true
-        interval: 1000
-        property int count: 10
+        interval: 5000
+        property int count: 6
         triggeredOnStart: true
         onTriggered: {
             HueDiscovery.abortDiscovery()
-            if (numAuthBridges === 1) {
+            /*if (numAuthBridges === 1) {
                 page.setBridge()
-            }
+            }*/
             if (count > 0) {
                 count--
                 HueDiscovery.discover()
             }
             else {
                 stop()
-                count = 10
+            }
+        }
+        onRunningChanged: {
+            if (!running) {
+                count = 6
             }
         }
     }
 
     Timer {
-        id: getResourcesTimer
-        interval: 100
-        repeat: true
-        triggeredOnStart: true
+        id: connectTimer
+        property int bridgeIndex
+        interval: 2000
         onTriggered: {
-            if (bridge != null) {
-                if (bridge.ready) {
-                    stop()
-                    pageStack.replace(Qt.resolvedUrl("HomePage.qml"))
-                }
+            if (HueDiscovery.bridge(bridgeIndex).ready) {
+                pageStack.replace(Qt.resolvedUrl("HomePage.qml"))
+            }
+            else {
+                pageStack.push(Qt.resolvedUrl("ConnectBridgePage.qml"), { connectBridge: HueDiscovery.bridge(bridgeIndex) })
             }
         }
+    }
+
+    Timer {
+        id: appStartTimer
+        interval: 2000
+        running: true
     }
 
     Connections {
@@ -53,12 +64,6 @@ Page {
         onBridgeChanged: {
             if (bridge != null) {
                 discoverTimer.stop()
-                bridgeConfig.path = appSettings.path + "/bridges/" + bridge.bridgeid
-                bridgeConfig.sync()
-                bridge.username = bridgeConfig.username
-                getResourcesTimer.start()
-                bridge.getResource(HueBridge.ResourceAll)
-                bridge.startEventStream()
             }
             else {
                 discoverTimer.start()
@@ -68,6 +73,7 @@ Page {
     }
 
     Component.onCompleted: {
+        HueDiscovery.clearBridges()
         discoverTimer.start()
         placeHolder.started = true
     }
@@ -89,14 +95,27 @@ Page {
                 }
             }*/
             MenuItem {
-                text: discoverTimer.running ? qsTr("Abort discovery") : qsTr("Discover bridges")
+                text: qsTr("Clear list")
+                visible: debug
+                enabled: !discoverTimer.running && HueDiscovery.count > 0
                 onClicked: {
-                    if (discoverTimer.running) {
-                        discoverTimer.stop()
-                    }
-                    else {
-                        discoverTimer.start()
-                    }
+                    discoverTimer.stop()
+                    HueDiscovery.clearBridges()
+                }
+            }
+            MenuItem {
+                text: qsTr("Abort discovery")
+                visible: discoverTimer.running
+                onClicked: {
+                    discoverTimer.stop()
+                    HueDiscovery.abortDiscovery()
+                }
+            }
+            MenuItem {
+                text: qsTr("Discover bridges")
+                visible: !discoverTimer.running
+                onClicked: {
+                    discoverTimer.start()
                 }
             }
         }
@@ -113,8 +132,18 @@ Page {
             }
 
             Connections {
-                target: page
-                onSetBridge: bridge = HueDiscovery.bridge(index)
+                target: HueDiscovery.bridge(index)
+                onReadyChanged: {
+                    console.log("Bridge ready", bridgeid, ready)
+                    bridgeAuthIcon.visible = ready
+                    if (bridgeid === appSettings.lastUsedBridge) {
+                        app.bridge = HueDiscovery.bridge(0)
+                        HueDiscovery.clearBridges([index])
+                    }
+                }
+                onBusyChanged: {
+                    bridgeBusyIndicator.running = busy
+                }
             }
 
             ConfigurationGroup {
@@ -122,9 +151,10 @@ Page {
                 path: appSettings.path + "/bridges/" + bridgeid
                 property string username
                 Component.onCompleted: {
-                    HueDiscovery.bridge(index).username = username
+                    //console.log(bridgeid, username)
                     if (username !== "") {
-                        numAuthBridges++
+                        HueDiscovery.bridge(index).username = thisBridgeConfig.username
+                        HueDiscovery.bridge(index).getResource()
                     }
                 }
             }
@@ -157,7 +187,7 @@ Page {
             }
             Icon {
                 id: bridgeAuthIcon
-                visible: username !== ""
+                visible: false
                 source: "image://theme/icon-m-link"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -165,18 +195,22 @@ Page {
             }
             BusyIndicator {
                 id: bridgeBusyIndicator
-                running: busy
-                size: BusyIndicatorSize.Medium
+                running: false
+                size: BusyIndicatorSize.Small
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
             }
 
             onClicked: {
-                if (username !== "") {
-                    bridge = HueDiscovery.bridge(index)
+                if (bridgeAuthIcon.visible) {
+                    app.bridge = HueDiscovery.bridge(0)
                     HueDiscovery.clearBridges([index])
-                    pageStack.pop()
+                }
+                else if (thisBridgeConfig.username !== "") {
+                    HueDiscovery.bridge(index).getResource()
+                    connectTimer.bridgeIndex = index
+                    connectTimer.restart()
                 }
                 else {
                     pageStack.push(Qt.resolvedUrl("ConnectBridgePage.qml"), { connectBridge: HueDiscovery.bridge(index) })
@@ -184,10 +218,27 @@ Page {
             }
         }
 
-        BusyLabel {
+//        Column {
+//            anchors.centerIn: parent
+//            width: parent.width
+//            visible: bridgeView.model.count === 0 && HueDiscovery.busy || appStart && appStartTimer.running
+//            BusyIndicator {
+//                anchors.centerIn: parent
+//                size: BusyIndicatorSize.Large
+//                running: parent.visible
+//            }
+//        }
+
+        PageBusyIndicator {
             id: busyLabel
-            running: bridgeView.model.count === 0 && HueDiscovery.busy
-            text: qsTr("Searching Bridges")
+            running: (HueDiscovery.busy && bridgeView.model.count === 0) || (appStart && appStartTimer.running && bridgeView.model.count <= 2)
+            //text: qsTr("Discovering Bridges")
+            Icon {
+                anchors.centerIn: parent
+                source: "../hueiconpack/HueIconPack2019/devicesBridgesV2.svg"
+                sourceSize.width: Theme.iconSizeLarge
+                sourceSize.height: Theme.iconSizeLarge
+            }
         }
         ViewPlaceholder {
             id: placeHolder

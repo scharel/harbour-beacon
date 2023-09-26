@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
 
@@ -28,18 +28,18 @@ Page {
             ButtonLayout {
                 Button {
                     id: bridgesButton
-                    icon.source: "../HueIconPack2019/devicesBridgesV2.svg"
-                    icon.height: bridgesButton.height
-                    icon.width: icon.height
+                    icon.source: "../hueiconpack/HueIconPack2019/devicesBridgesV2.svg"
+                    icon.sourceSize.height: bridgesButton.height
+                    icon.sourceSize.width: icon.height
                     icon.fillMode: Image.PreserveAspectFit
                     text: qsTr("Bridges")
                     onClicked: pageStack.push(Qt.resolvedUrl("BridgesPage.qml"))
                 }
                 Button {
                     id: devicesButton
-                    icon.source: "../HueIconPack2019/settingsDevices.svg"
-                    icon.height: devicesButton.height
-                    icon.width: icon.height
+                    icon.source: "../hueiconpack/HueIconPack2019/settingsDevices.svg"
+                    icon.sourceSize.height: devicesButton.height
+                    icon.sourceSize.width: icon.height
                     icon.fillMode: Image.PreserveAspectFit
                     text: qsTr("Devices")
                     onClicked: pageStack.push(Qt.resolvedUrl("DevicesPage.qml"))

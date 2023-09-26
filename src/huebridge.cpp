@@ -28,12 +28,7 @@ HueBridge::HueBridge(const QString& bridgeid, const QString &modelid, QObject *p
 }
 
 HueBridge::~HueBridge() {
-    while (!m_replies.empty()) {
-        QNetworkReply* reply = m_replies.first();
-        reply->abort();
-        reply->deleteLater();
-        m_replies.removeFirst();
-    }
+    m_manager.deleteLater();
     for (int i = ResourceLight; i < ResourceAll; ++i) {
         m_resources[i]->sourceModel()->deleteLater();
         m_resources[i]->deleteLater();
@@ -101,6 +96,17 @@ const QHash<int, QByteArray> HueBridge::m_resourceEndpoints = QHash<int, QByteAr
             {HueBridge::ResourceAll, ""}
         } );
 
+bool HueBridge::busy() const {
+    bool busy = false;
+    QList<QNetworkReply *> replies = m_manager.findChildren<QNetworkReply *>();
+    for (int i = 0; i < replies.size() && !busy; ++i) {
+        if (replies.at(i) != m_streamReply) {
+            busy |= replies.at(i)->isRunning();
+        }
+    }
+    return busy;
+}
+
 void HueBridge::setAddress(const QHostAddress& address) {
     if (address != m_address) {
         m_address = address;
@@ -158,9 +164,7 @@ QVariant HueBridge::property(int role) const {
 bool HueBridge::createUser(const QString& instance_name) {
     if (!m_address.isNull()) {
         QJsonDocument body( QJsonObject({ {"devicetype", QString("%1#%2").arg(QGuiApplication::applicationName()).arg(instance_name) }, { "generateclientkey", true } }));
-        m_replies << m_manager.post(prepareRequest(BRIDGE_USER_ENDPOINT), body.toJson());
-        if (m_replies.count() == 1)
-            emit busyChanged(true);
+        m_manager.post(prepareRequest(BRIDGE_USER_ENDPOINT), body.toJson());
         return true;
     }
     return false;
@@ -168,9 +172,7 @@ bool HueBridge::createUser(const QString& instance_name) {
 
 bool HueBridge::getConfig() {
     if (!m_address.isNull()) {
-        m_replies << m_manager.get(prepareRequest(BRIDGE_CONFIG_ENDPOINT));
-        if (m_replies.count() == 1)
-            emit busyChanged(true);
+        m_manager.get(prepareRequest(BRIDGE_CONFIG_ENDPOINT));
         return true;
     }
     return false;
@@ -182,9 +184,7 @@ bool HueBridge::getResource(ResourceType resource, const QString& id) {
         if (resource != ResourceAll) endpoint += "/" + m_resourceEndpoints[resource];
         if (!id.isEmpty())
             endpoint += "/" + id;
-        m_replies << m_manager.get(prepareRequest(endpoint));
-        if (m_replies.count() == 1)
-            emit busyChanged(true);
+        m_manager.get(prepareRequest(endpoint));
         return true;
     }
     return false;
@@ -201,9 +201,7 @@ bool HueBridge::putResource(ResourceType resource, const QJsonObject &json, cons
         }
         if (!myId.isEmpty()) {      // do the API call if any id is usable
             QString endpoint = RESOURCE_ENDPOINT + "/" + m_resourceEndpoints[resource] + "/" + myId;
-            m_replies << m_manager.put(prepareRequest(endpoint), QJsonDocument(json).toJson());
-            if (m_replies.count() == 1)
-                emit busyChanged(true);
+            m_manager.put(prepareRequest(endpoint), QJsonDocument(json).toJson());
             return true;
         }
     }
@@ -218,9 +216,7 @@ bool HueBridge::delResource(ResourceType resource, const QString& id) {
         }
         if (!myId.isEmpty()) {      // do the API call if any id is usable
             QString endpoint = RESOURCE_ENDPOINT + "/" + m_resourceEndpoints[resource] + "/" + myId;
-            m_replies << m_manager.deleteResource(prepareRequest(endpoint));
-            if (m_replies.count() == 1)
-                emit busyChanged(true);
+            m_manager.deleteResource(prepareRequest(endpoint));
             return true;
         }
     }
@@ -228,20 +224,29 @@ bool HueBridge::delResource(ResourceType resource, const QString& id) {
 }
 
 bool HueBridge::startEventStream() {
+    qDebug() << "Starting event stream";
     if (!m_address.isNull() && !m_username.isEmpty() && m_streamReply == nullptr) {
         m_streamReply = m_manager.get(prepareEventStreamRequest(EVENTSTREAM_ENDPOINT));
-        connect(m_streamReply, SIGNAL(readyRead()), this, SLOT(streamEventReceived()));
+        if (m_streamReply->error() == QNetworkReply::NoError) {
+            connect(m_streamReply, SIGNAL(readyRead()), this, SLOT(streamEventReceived()));
+            emit streamChanged(stream());
+        }
+        else {
+            stopEventStream();
+        }
         return true;
     }
     return false;
 }
 
 bool HueBridge::stopEventStream() {
+    qDebug() << "Stopping event stream";
     if (m_streamReply != nullptr) {
         disconnect(m_streamReply, SIGNAL(readyRead()), this, SLOT(streamEventReceived()));
         m_streamReply->abort();
         m_streamReply->deleteLater();
         m_streamReply = nullptr;
+        emit streamChanged(false);
         return true;
     }
     return false;
@@ -338,11 +343,11 @@ void HueBridge::replyFinished(QNetworkReply* reply) {
         stopEventStream();
         startEventStream();
     }
-    else if (m_replies.contains(reply)) {
+    else {
         if (reply->error() == QNetworkReply::NoError) {
             QString path = reply->url().path();
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-            //qDebug() << path;
+            qDebug() << path;
             //qDebug() << doc;
             switch (reply->operation()) {
             case QNetworkAccessManager::GetOperation:
@@ -374,23 +379,9 @@ void HueBridge::replyFinished(QNetworkReply* reply) {
         else {
             qDebug() << reply->error() << reply->errorString();
         }
-        m_replies.removeAll(reply);
-        if (m_replies.count() == 0)
-            emit busyChanged(false);
     }
-    else if (reply->operation() == QNetworkAccessManager::PutOperation ||
-             reply->operation() == QNetworkAccessManager::PostOperation ||
-             reply->operation() == QNetworkAccessManager::DeleteOperation) {
-        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-        QJsonArray errors = doc.object().value("errors").toArray();
-        for (int e = 0; e < errors.size(); ++e) {
-            qDebug() << errors[e];
-        }
-    }
-    else {
-        qDebug() << "Unknown reply";
-        qDebug() << reply->readAll();
-    }
+    reply->deleteLater();
+    emit busyChanged(busy());
 }
 
 void HueBridge::streamEventReceived() {

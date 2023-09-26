@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
 
@@ -22,9 +22,11 @@ Dialog {
                 height: Theme.iconSizeLarge
                 Icon {
                     id: archeIcon
-                    anchors.fill: parent
                     property string archeType: page.archeType
-                    source: "../HueIconPack2019/" + deviceArchetypeImages[archeType]
+                    source: "../hueiconpack/HueIconPack2019/" + deviceArchetypeImages[archeType]
+                    sourceSize.width: Theme.iconSizeLarge
+                    sourceSize.height: Theme.iconSizeLarge
+                    //source: "../hueiconpack/ApiV2Archetype/" + archeType + ".svg"
                 }
                 onClicked: Dialog
             }

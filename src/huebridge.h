@@ -55,8 +55,9 @@ class HueBridge : public QObject
 
     // Class state properties
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)   // if network connectivity is accessible
-    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)      // when an API call is currently running
-    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)   // when all resources have been received
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)          // when an API call is currently running
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)       // when all resources have been received
+    Q_PROPERTY(bool stream READ stream NOTIFY streamChanged)    // when API event stream is active
 
     // Properties resolved by uDNS
     Q_PROPERTY(QHostAddress address READ address WRITE setAddress NOTIFY addressChanged)
@@ -89,6 +90,7 @@ public:
         NetworkAccessibleRole = Qt::UserRole,
         BusyRole,
         ReadyRole,
+        StreamRole,
         DummyLastClassRole
     };
     static QHash<int, QByteArray> classRoleNames();
@@ -156,13 +158,14 @@ public:
     Q_ENUM(ResourceType)
 
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
-    bool busy() const { return m_replies.count() > 0; }
+    bool busy() const;
 
     const QHostAddress& address() const { return m_address; }
     void setAddress(const QHostAddress& address);
     qint16 port() const { return m_port; }
     void setPort(quint16 port);
     bool ready() { return m_resourcesAllReceived; }
+    bool stream() { return networkAccessible() && (m_streamReply ? m_streamReply->isRunning() && !m_streamReply->isFinished() : false); }
 
     const QString name() const { return property(NameRole).toString(); }
     const QString datastoreversion() const { return property(DatastoreversionRole).toString(); }
@@ -202,6 +205,7 @@ signals:
     void addressChanged(const QHostAddress& address);
     void portChanged(quint16 port);
     void readyChanged(bool ready);
+    void streamChanged(bool stream);
 
     void nameChanged(const QString& name);
     void datastoreversionChanged(const QString& datastoreversion);
@@ -252,7 +256,6 @@ private:
     bool m_resourcesAllReceived;
 
     QNetworkAccessManager m_manager;
-    QVector<QNetworkReply*> m_replies;
     QNetworkReply* m_streamReply;
     QQueue<QString> m_lightCommandQueueIDs;
     QMultiMap<QString, QJsonObject> m_lightCommandValues;

@@ -34,16 +34,22 @@ HEADERS += \
 #    src/test/testbridge.h
 
 DISTFILES += qml/harbour-beacon.qml \
+    LICENSE \
+    README.md \
+    qml/components/ColorPicker.qml \
     qml/cover/CoverPage.qml \
+    qml/js/hue-colors.js \
     qml/pages/AboutPage.qml \
     qml/pages/AddBridgeDialog.qml \
     qml/pages/BridgesPage.qml \
     qml/pages/ConnectBridgePage.qml \
-    qml/HueIconPack2019/*.svg \
+    qml/hueiconpack/HueIconPack2019/*.svg \
+    qml/hueiconpack/ApiV2Archetype/*.svg \
     qml/pages/DevicePage.qml \
     qml/pages/DevicesPage.qml \
     qml/pages/GroupPage.qml \
     qml/pages/HomePage.qml \
+    qml/pages/LightPage.qml \
     qml/pages/SettingsPage.qml \
     rpm/harbour-beacon.changes.in \
     rpm/harbour-beacon.changes.run.in \

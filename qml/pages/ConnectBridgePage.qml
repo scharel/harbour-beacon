@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
@@ -68,7 +68,7 @@ Page {
                 Icon {
                     anchors.centerIn: parent
                     source: busyIndicator.running ? "image://theme/icon-l-transfer" : "image://theme/icon-l-check"
-                    //source: Qt.resolvedUrl("../../icons/HueIconPack2019/devicesBridgesV2.svg")
+                    //source: Qt.resolvedUrl("../../icons/hueiconpack/HueIconPack2019/devicesBridgesV2.svg")
                     color: busyIndicator.running ? palette.secondaryColor : "green"
                 }
             }

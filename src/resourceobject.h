@@ -27,6 +27,9 @@ public:
     ResourceObject(const ResourceObject& other) : QObject(other.parent()) {
         m_rdata = other.rdata();
     }
+    ~ResourceObject() {
+        qDebug() << "Deleting" << rid() << rtype();
+    }
     ResourceObject& operator= (const ResourceObject& other) {
         m_rdata = other.rdata();
         return *this;

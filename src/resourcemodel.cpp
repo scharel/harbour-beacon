@@ -1,5 +1,7 @@
 #include "resourcemodel.h"
 
+#include <QQmlEngine>
+
 ResourceSortFilterProxyModel::ResourceSortFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
 }
 
@@ -191,6 +193,7 @@ int ResourceModel::updateResource(const QJsonObject &resource) {
         //qDebug() << "Adding resource " << row << resource["id"];
         emit beginInsertRows(QModelIndex(), row, row);
         m_resources << new ResourceObject(resource);
+        QQmlEngine::setObjectOwnership(m_resources.last(), QQmlEngine::CppOwnership);   // prevent QML from deleting resource objects
         connect(m_resources.last(), SIGNAL(rdataChanged(const QJsonObject&)), this, SLOT(onResourceChanged(const QJsonObject&)));
         emit endInsertRows();
     }
