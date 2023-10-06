@@ -73,7 +73,7 @@ Page {
     }
 
     Component.onCompleted: {
-        HueDiscovery.clearBridges()
+        //HueDiscovery.clearBridges()
         discoverTimer.start()
         placeHolder.started = true
     }
@@ -124,11 +124,13 @@ Page {
             title: qsTr("Hue Bridges")
         }
         delegate: BackgroundItem {
-            id: delegate
+            id: bridge
             height: Theme.itemSizeLarge
 
             Component.onCompleted: {
                 HueDiscovery.bridge(index).getConfig()
+                bridgeAuthIcon.visible = ready
+                bridgeBusyIndicator.running = busy
             }
 
             Connections {
@@ -203,7 +205,7 @@ Page {
             }
 
             onClicked: {
-                if (bridgeAuthIcon.visible) {
+                if (bridge.ready) {
                     app.bridge = HueDiscovery.bridge(0)
                     HueDiscovery.clearBridges([index])
                 }

@@ -33,8 +33,8 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
-    Q_INVOKABLE HueBridge* bridge(int index = 0) const;
 
+    Q_INVOKABLE HueBridge* bridge(int index = 0) const;
     Q_INVOKABLE int discover(const QString& query = HUE_MDNS, int pollIntercal = 100);
     Q_INVOKABLE void clearBridges(const QList<int>& keep = QList<int>());
 

@@ -1,20 +1,28 @@
 // https://developers.meethue.com/develop/get-started-2/core-concepts/#colors-get-more-complicated
-const HUE_MIN_LIGHT_MIREK = 153;  // coldest color 6500K
-const HUE_MAX_LIGHT_MIREK = 500;  // warmest color 2000K
+var HUE_MIN_LIGHT_MIREK = 153;  // coldest color 6500K
+var HUE_MAX_LIGHT_MIREK = 500;  // warmest color 2000K
+
+function lightToColor(light) {
+    var x = light.rdata.color.xy.x
+    var y = light.rdata.color.xy.y
+    var b = light.rdata.dimming.brightness
+    var rgb = xyToRgb(x,y,b)
+    return '#' + rgb.r.toString(16) + rgb.g.toString(16) + rgb.b.toString(16)// + parseInt(light.rdata.dimming.brightness).toString(16)
+}
 
 // https://stackoverflow.com/questions/22894498/philips-hue-convert-xy-from-api-to-hex-or-rgb
 function xyToRgb(x, y, bri){
-    z = 1.0 - x - y;
-    Y = bri / 255.0; // Brightness of lamp
-    X = (Y / y) * x;
-    Z = (Y / y) * z;
-    r = X * 1.612 - Y * 0.203 - Z * 0.302;
-    g = -X * 0.509 + Y * 1.412 + Z * 0.066;
-    b = X * 0.026 - Y * 0.072 + Z * 0.962;
+    var z = 1.0 - x - y;
+    var Y = bri / 255.0; // Brightness of lamp
+    var X = (Y / y) * x;
+    var Z = (Y / y) * z;
+    var r = X * 1.612 - Y * 0.203 - Z * 0.302;
+    var g = -X * 0.509 + Y * 1.412 + Z * 0.066;
+    var b = X * 0.026 - Y * 0.072 + Z * 0.962;
     r = r <= 0.0031308 ? 12.92 * r : (1.0 + 0.055) * Math.pow(r, (1.0 / 2.4)) - 0.055;
     g = g <= 0.0031308 ? 12.92 * g : (1.0 + 0.055) * Math.pow(g, (1.0 / 2.4)) - 0.055;
     b = b <= 0.0031308 ? 12.92 * b : (1.0 + 0.055) * Math.pow(b, (1.0 / 2.4)) - 0.055;
-    maxValue = Math.max(r,g,b);
+    var maxValue = Math.max(r,g,b);
     r /= maxValue;
     g /= maxValue;
     b /= maxValue;
@@ -163,4 +171,4 @@ function precision(d) {
     return Math.round(10000.0 * d) / 10000.0;
 }
 
-module.exports = { MIREK_MIN, MIREK_MAX, xyToRgb, rgpToXy }
+//module.exports = { xyToRgb, rgpToXy }

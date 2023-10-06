@@ -1,6 +1,7 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
+import "../js/hue-colors.js" as Color
 
 Page {
     id: page
@@ -33,16 +34,16 @@ Page {
 //                        bridge.putResource(HueBridge.ResourceGroupedLight, { on: { on: !grouped_light.rdata.on.on } }, grouped_light.rid)
 //                    }
 //                }
-                Icon {
-                    id: groupIcon
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: pageHeader.extraContent.right
-                    anchors.rightMargin: Theme.paddingSmall
-                    sourceSize.width: Theme.iconSizeSmall
-                    sourceSize.height: Theme.iconSizeSmall
-                    source: "../hueiconpack/HueIconPack2019/" + roomArchetypeImages[group_owner.rdata.metadata.archetype]
-                    //source: "../hueiconpack/ApiV2Archetype/" + group_owner.rdata.metadata.archetype + ".svg"
-                }
+//                Icon {
+//                    id: groupIcon
+//                    anchors.verticalCenter: parent.verticalCenter
+//                    anchors.right: pageHeader.extraContent.right
+//                    anchors.rightMargin: Theme.paddingSmall
+//                    sourceSize.width: Theme.iconSizeSmall
+//                    sourceSize.height: Theme.iconSizeSmall
+//                    source: "../hueiconpack/HueIconPack2019/" + roomArchetypeImages[group_owner.rdata.metadata.archetype]
+//                    //source: "../hueiconpack/ApiV2Archetype/" + group_owner.rdata.metadata.archetype + ".svg"
+//                }
                 title: group_owner.rdata.metadata.name
             }
 
@@ -50,9 +51,7 @@ Page {
                 id: groupIconSwitch
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
-                //text: checked ? qsTr("Turn off") : qsTr("Turn off")
-                //icon.source: "image://theme/icon-m-light-contrast"
-                icon.source: "../hueiconpack/HueIconPack2019/bulbGroup.svg"
+                icon.source: "../hueiconpack/HueIconPack2019/" + roomArchetypeImages[group_owner.rdata.metadata.archetype]
                 icon.sourceSize.width: Theme.iconSizeMedium
                 icon.sourceSize.height: Theme.iconSizeMedium
                 automaticCheck: false
@@ -95,9 +94,11 @@ Page {
                 id: sceneComboBox
                 width: parent.width
                 label: qsTr("Select scene")
+                enabled: sceneRepeater.count > 0
                 currentIndex: -1
                 menu: ContextMenu {
                     Repeater {
+                        id: sceneRepeater
                         model: bridge.resourceModel(HueBridge.ResourceScene)
                         delegate: MenuItem {
                             text: resource.metadata.name
@@ -148,9 +149,18 @@ Page {
                             bridge.setLight(light.rid, { on: { on: !light.rdata.on.on } })
                         }
                         text: light != null ? light.rdata.metadata.name : ""
+                        description: debug && light != null && light.rdata.color != null ? JSON.stringify(Color.lightToColor(light)) : ""
                         icon.source: "../hueiconpack/ApiV2Archetype/" + light.rdata.metadata.archetype + ".svg"
                         icon.sourceSize.width: Theme.iconSizeSmallPlus
                         icon.sourceSize.height: Theme.iconSizeSmallPlus
+                        GlassItem {
+                            //height: parent.height
+                            //width: height
+                            //anchors.right: parent.icon.left
+                            anchors.fill: parent
+                            visible: light != null && light.rdata.color != null
+                            color: visible ? Color.lightToColor(light) : "white"
+                        }
                     }
 
 //                    Row {
