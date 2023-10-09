@@ -107,6 +107,12 @@ Page {
                                 console.log("Activate scene", resource.metadata.name, rid)
                                 bridge.putResource(HueBridge.ResourceScene, { recall: { action: "active" } }, rid)
                             }
+                            Component.onCompleted: {
+                               if (resource.status.active !== "inactive" && visible) {
+                                   console.log(resource.metadata.name, resource.status.active)
+                                   sceneComboBox.currentIndex = index
+                               }
+                            }
                         }
                     }
                 }
