@@ -339,9 +339,9 @@ void HueBridge::replyFinished(QNetworkReply* reply) {
     //qDebug() << reply->readAll();
 
     if (reply == m_streamReply) {
-        qDebug() << "Event Stream finished, restarting";
-        stopEventStream();
-        startEventStream();
+        qDebug() << "Event Stream finished";
+        //stopEventStream();
+        //startEventStream();
     }
     else {
         if (reply->error() == QNetworkReply::NoError) {

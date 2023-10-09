@@ -26,6 +26,21 @@ ApplicationWindow {
         }
     }
 
+    Connections {
+        target: Qt.application
+        onStateChanged: {
+            if (bridge != null) {
+                if (state === Qt.ApplicationActive) {
+                    bridge.getResource()
+                    bridge.startEventStream()
+                }
+                if (state === Qt.ApplicationInactive) {
+                    bridge.stopEventStream()
+                }
+            }
+        }
+    }
+
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-beacon"
