@@ -13,6 +13,7 @@ class ResourceSortFilterProxyModel : public QSortFilterProxyModel {
     Q_PROPERTY(QStringList favoritePath READ favoritePath WRITE setFavoritePath NOTIFY favoritePathChanged)
     Q_PROPERTY(QRegExp favoriteRegExp READ favoriteRegExp WRITE setFavoriteRegExp NOTIFY favoriteRegExpChanged)
     Q_PROPERTY(QStringList sectionPath READ sectionPath WRITE setSectionPath NOTIFY sectionPathChanged)
+    Q_PROPERTY(QStringList sortPath READ sortPath WRITE setSortPath NOTIFY sortPathChanged)
     Q_PROPERTY(QStringList resourceOrder READ resourceOrder WRITE setResourceOrder NOTIFY resourceOrderChanged)
 
 public:
@@ -37,6 +38,8 @@ public:
     void setFavoritePath(const QStringList& path);
     const QRegExp& favoriteRegExp() const { return m_favoriteRegExp; }
     void setFavoriteRegExp(const QRegExp& regexp);
+    const QStringList& sortPath() const { return m_sortPath; }
+    void setSortPath(const QStringList& path);
     const QStringList& resourceOrder() const { return m_resourceOrder; }
     void setResourceOrder(const QStringList& order);
 
@@ -48,14 +51,17 @@ signals:
     void favoritePathChanged(const QStringList& path);
     void favoriteRegExpChanged(const QRegExp& regexp);
     void sectionPathChanged(const QStringList& path);
+    void sortPathChanged(const QStringList& path);
     void resourceOrderChanged(const QStringList& order);
 
 private:
     bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
-    bool resourceContains(const QModelIndex & source, const QStringList& path, const QRegExp& regexp) const;
+    QVariant resourceValue(const QModelIndex & source, const QStringList& path) const;
+    bool resourceContains(const QModelIndex & source, const QStringList& path, const QRegExp& regexp = QRegExp(".+")) const;
     QStringList m_filterPath;
     QStringList m_favoritePath;
     QRegExp m_favoriteRegExp;
+    QStringList m_sortPath;
     QStringList m_resourceOrder;
 };
 

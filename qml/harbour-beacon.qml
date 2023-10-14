@@ -15,6 +15,8 @@ ApplicationWindow {
         if (bridge != null) {
             bridgeConfig.path = appSettings.path + "/bridges/" + bridge.bridgeid
             bridgeConfig.sync()
+            bridge.resourceModel(HueBridge.ResourceScene).sortRole = ResourceModel.ResourceRole
+            bridge.resourceModel(HueBridge.ResourceScene).sortPath = ['metadata', 'name']
             bridge.username = bridgeConfig.username
             bridge.startEventStream()
             appSettings.lastUsedBridge = bridge.bridgeid

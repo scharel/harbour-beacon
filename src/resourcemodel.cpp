@@ -50,6 +50,14 @@ void ResourceSortFilterProxyModel::setFavoriteRegExp(const QRegExp &regexp) {
     }
 }
 
+void ResourceSortFilterProxyModel::setSortPath(const QStringList &path) {
+    if (path != m_sortPath) {
+        m_sortPath = path;
+        emit sortPathChanged(m_sortPath);
+        sort(0);
+    }
+}
+
 void ResourceSortFilterProxyModel::setResourceOrder(const QStringList &order) {
     if (order != m_resourceOrder) {
         m_resourceOrder = order;
@@ -91,24 +99,47 @@ bool ResourceSortFilterProxyModel::moveDown(int source) {
 }
 
 bool ResourceSortFilterProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
+    bool less = source_left.data(sortRole()) < source_right.data(sortRole());
+    // favorites on top
     if (!m_favoritePath.isEmpty() && !m_favoriteRegExp.isEmpty() &&
             (resourceContains(source_left, m_favoritePath, m_favoriteRegExp) ^ resourceContains(source_right, m_favoritePath, m_favoriteRegExp))) {
-        return resourceContains(source_left, m_favoritePath, m_favoriteRegExp) && !resourceContains(source_right, m_favoritePath, m_favoriteRegExp);
+        //qDebug() << "favorites on top";
+        less = resourceContains(source_left, m_favoritePath, m_favoriteRegExp) && !resourceContains(source_right, m_favoritePath, m_favoriteRegExp);
     }
-    if (m_resourceOrder.contains(source_left.data(RidRole).toString()) || m_resourceOrder.contains(source_right.data(RidRole).toString())) {
+    // explicit sort order
+    else if (m_resourceOrder.contains(source_left.data(RidRole).toString()) || m_resourceOrder.contains(source_right.data(RidRole).toString())) {
         //qDebug() << source_left.data(RidRole).toString() << source_right.data(RidRole).toString() << (m_resourceOrder.indexOf(source_left.data(RidRole).toString()) < m_resourceOrder.indexOf(source_right.data(RidRole).toString()));
-        return m_resourceOrder.indexOf(source_left.data(RidRole).toString()) < m_resourceOrder.indexOf(source_right.data(RidRole).toString());
+        //qDebug() << "explicit sort order";
+        less = m_resourceOrder.indexOf(source_left.data(RidRole).toString()) < m_resourceOrder.indexOf(source_right.data(RidRole).toString());
     }
-    return source_left.data(sortRole()) < source_right.data(sortRole());
+    // sort by role
+    else {
+        //qDebug() << "sort by role" << sortRole();
+        switch (sortRole()) {
+        case ResourceRole:
+            if (!m_sortPath.isEmpty() &&
+                    (resourceContains(source_left, m_sortPath) || resourceContains(source_left, m_sortPath))) {
+                QVariant resource_left = resourceValue(source_left, m_sortPath);
+                QVariant resource_right = resourceValue(source_right, m_sortPath);
+                //qDebug() << resource_left << resource_right;
+                less = QString::compare(resource_left.toString(), resource_right.toString()) < 0;
+            }
+            break;
+        }
+    }
+    return less;
 }
 
-bool ResourceSortFilterProxyModel::resourceContains(const QModelIndex &source, const QStringList &path, const QRegExp &regexp) const {
+QVariant ResourceSortFilterProxyModel::resourceValue(const QModelIndex &source, const QStringList &path) const {
     QJsonValue val = QJsonValue::fromVariant(source.data(ResourceModel::ResourceRole));
     for (int i = 0; i < path.size(); ++i) {
         val = val.toObject()[path.at(i)];
     }
-    //qDebug() << val.toString() << regexp << val.toString().contains(regexp);
-    return val.toString().contains(regexp);
+    return val.toVariant();
+}
+
+bool ResourceSortFilterProxyModel::resourceContains(const QModelIndex &source, const QStringList &path, const QRegExp &regexp) const {
+    return resourceValue(source, path).toString().contains(regexp);
 }
 
 ResourceModel::ResourceModel(QObject *parent) : QAbstractListModel(parent)
