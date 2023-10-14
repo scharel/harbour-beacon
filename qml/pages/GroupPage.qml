@@ -1,6 +1,8 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.beacon 1.0
+
+import "../components"
 import "../js/hue-colors.js" as Color
 
 Page {
@@ -16,34 +18,8 @@ Page {
             id: column
 
             anchors.fill: parent
-            //spacing: Theme.paddingLarge
             PageHeader {
                 id: pageHeader
-
-//                Switch {
-//                    id: groupSwitch
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    //anchors.left: pageHeader.extraContent.left
-//                    anchors.right: groupIcon.left
-//                    //icon.source: "../hueiconpack/HueIconPack2019/" + archetypeImages[group_owner.rdata.metadata.archetype]
-//                    automaticCheck: false
-//                    checked: grouped_light.rdata.on.on
-//                    onCheckedChanged: busy = false
-//                    onClicked: {
-//                        busy = true
-//                        bridge.putResource(HueBridge.ResourceGroupedLight, { on: { on: !grouped_light.rdata.on.on } }, grouped_light.rid)
-//                    }
-//                }
-//                Icon {
-//                    id: groupIcon
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    anchors.right: pageHeader.extraContent.right
-//                    anchors.rightMargin: Theme.paddingSmall
-//                    sourceSize.width: Theme.iconSizeSmall
-//                    sourceSize.height: Theme.iconSizeSmall
-//                    source: "../hueiconpack/HueIconPack2019/" + roomArchetypeImages[group_owner.rdata.metadata.archetype]
-//                    //source: "../hueiconpack/ApiV2Archetype/" + group_owner.rdata.metadata.archetype + ".svg"
-//                }
                 title: group_owner.rdata.metadata.name
             }
 
@@ -124,13 +100,11 @@ Page {
             }
             Repeater {
                 model: group_owner.rdata.children
-                delegate: BackgroundItem {
-                    id: ownerItem
-                    width: page.width
+                delegate: LightListItem {
+                    width: parent.width
                     property string rid: group_owner.rdata.children[index].rid
                     property string rtype: group_owner.rdata.children[index].rtype
                     property ResourceObject device: null
-                    property ResourceObject light: null
                     Component.onCompleted: {
                         if (rtype === "device") {
                             device = bridge.resource(HueBridge.ResourceDevice, rid)
@@ -142,53 +116,11 @@ Page {
                         }
                         if (rtype === "light") {
                             light = bridge.resource(HueBridge.ResourceLight, rid)
-                            device = bridge.resource(HueBridge.ResourceDevice, light.rdata.owner.rid)
                         }
                     }
-                    IconTextSwitch {
-                        enabled: light != null
-                        automaticCheck: false
-                        checked: light != null ? light.rdata.on.on : false
-                        onCheckedChanged: busy = false
-                        onClicked: {
-                            busy = true
-                            bridge.setLight(light.rid, { on: { on: !light.rdata.on.on } })
-                        }
-                        text: light != null ? light.rdata.metadata.name : ""
-                        description: debug && light != null && light.rdata.color != null ? JSON.stringify(Color.lightToColor(light)) : ""
-                        icon.source: "../hueiconpack/ApiV2Archetype/" + light.rdata.metadata.archetype + ".svg"
-                        icon.sourceSize.width: Theme.iconSizeSmallPlus
-                        icon.sourceSize.height: Theme.iconSizeSmallPlus
-                        GlassItem {
-                            //height: parent.height
-                            //width: height
-                            //anchors.right: parent.icon.left
-                            anchors.fill: parent
-                            visible: light != null && light.rdata.color != null
-                            color: visible ? Color.lightToColor(light) : "white"
-                        }
-                    }
-
-//                    Row {
-//                        Switch {
-//                            id: onSwitch
-//                            anchors.verticalCenter: parent.verticalCenter
-//                            enabled: light != null
-//                            automaticCheck: false
-//                            checked: light != null ? light.rdata.on.on : false
-//                            onCheckedChanged: busy = false
-//                            onClicked: {
-//                                busy = true
-//                                bridge.setLight(light.rid, { on: { on: !light.rdata.on.on } })
-//                            }
-//                        }
-//                        Label {
-//                            anchors.verticalCenter: parent.verticalCenter
-//                            color: Theme.secondaryColor
-//                            text: light != null ? light.rdata.metadata.name : ""
-//                        }
-//                    }
-                    onClicked: pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
+                    onClicked: if (debug) pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
+                    onOnChanged: bridge.setLight(light.rid, { on: { on: on } })
+                    onBrightnessChanged: bridge.setLight(light.rid, { on: { on: true }, dimming: { brightness: brightness } })
                 }
             }
         }

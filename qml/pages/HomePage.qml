@@ -61,14 +61,6 @@ Page {
                     bridge.setGroup(homeGroup.rid, { on: { on: !homeGroup.rdata.on.on } })
                 }
             }
-//            Icon {
-//                anchors.verticalCenter: parent.verticalCenter
-//                anchors.right: parent.extraContent.right
-//                anchors.rightMargin: Theme.paddingMedium
-//                opacity: bridge.stream ? 1.0 : 0.0
-//                Behavior on opacity { FadeAnimator {} }
-//                source: "image://theme/icon-m-link"
-//            }
         }
 
         delegate: ListItem {
@@ -197,23 +189,6 @@ Page {
                         onClicked: groupModel.moveDown(index) //console.log("Move", rid, "down")
                     }
                 //}
-
-                /*ComboBox {
-                    width: parent.width
-                    label: qsTr("Scene")
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    currentIndex: -1
-                    menu: ContextMenu {
-                        Repeater {
-                            model: bridge.resourceModel(HueBridge.ResourceScene)
-                            delegate: MenuItem {
-                                text: resource.metadata.name
-                                visible: resource.group.rid ===  listItem.ownerId
-                                onClicked: bridge.putResource(HueBridge.ResourceScene, { target: { rid: listItem.groupId }, action: { on: { on: true } } }, rid)
-                            }
-                        }
-                    }
-                }*/
             }
         }
 
