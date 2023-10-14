@@ -172,11 +172,11 @@
 <context>
     <name>LightPage</name>
     <message>
-        <source>Brightness</source>
+        <source>Identify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Identify</source>
+        <source>Brightness</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

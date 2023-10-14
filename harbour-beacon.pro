@@ -36,7 +36,7 @@ HEADERS += \
 DISTFILES += qml/harbour-beacon.qml \
     LICENSE \
     README.md \
-    qml/components/ColorPicker.qml \
+    qml/components/ColorPickerItem.qml \
     qml/components/GroupListItem.qml \
     qml/components/LightListItem.qml \
     qml/cover/CoverPage.qml \

@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import harbour.beacon 1.0
 
 import "../components"
+import "../js/hue-colors.js" as Color
 
 Page {
     id: page
@@ -47,13 +48,20 @@ Page {
                 description: device.rdata.product_data.product_name
             }
 
-            ColorPicker {
+            ColorPickerItem {
                 id: colorPicker
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
                 rgbaVisible: typeof(light.rdata.color) !== "undefined"
-                ctVisible: typeof(light.rdata.color_temperature) !== "undefined"
-                visible: rgbaVisible && ctVisible
+                ctVisible: debug && typeof(light.rdata.color_temperature) !== "undefined"
+                visible: rgbaVisible || ctVisible
+                onColorChanged: {
+                    var xy = Color.rgpToXy(color.r, color.g, color.b)
+                    bridge.setLight(light.rid, { color: { xy: { x: xy[0] , y: xy[1] } } })
+                }
+                onMirekChanged: {
+                    bridge.setLight(light.rid, { color: { mirek: mirek } })
+                }
             }
             Slider {
                 id: dimmSlider

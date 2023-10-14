@@ -118,7 +118,7 @@ Page {
                             light = bridge.resource(HueBridge.ResourceLight, rid)
                         }
                     }
-                    onClicked: if (debug) pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
+                    onClicked: pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
                     onOnChanged: bridge.setLight(light.rid, { on: { on: on } })
                     onBrightnessChanged: bridge.setLight(light.rid, { on: { on: true }, dimming: { brightness: brightness } })
                 }

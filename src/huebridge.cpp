@@ -347,7 +347,7 @@ void HueBridge::replyFinished(QNetworkReply* reply) {
         if (reply->error() == QNetworkReply::NoError) {
             QString path = reply->url().path();
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-            qDebug() << path;
+            //qDebug() << path;
             //qDebug() << doc;
             switch (reply->operation()) {
             case QNetworkAccessManager::GetOperation:
