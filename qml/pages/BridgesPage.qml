@@ -74,6 +74,11 @@ Page {
 
     Component.onCompleted: {
         //HueDiscovery.clearBridges()
+
+        console.log(bridgeConfig.lastAddress)
+        if (bridgeConfig.lastAddress) {
+            HueDiscovery.addBridge(appSettings.lastUsedBridge, bridgeConfig.lastAddress)
+        }
         discoverTimer.start()
         placeHolder.started = true
     }
@@ -127,6 +132,7 @@ Page {
             id: bridge
             height: Theme.itemSizeLarge
 
+
             Component.onCompleted: {
                 HueDiscovery.bridge(index).getConfig()
                 bridgeAuthIcon.visible = ready
@@ -152,6 +158,7 @@ Page {
                 id: thisBridgeConfig
                 path: appSettings.path + "/bridges/" + bridgeid
                 property string username
+                property string lastAddress: address
                 Component.onCompleted: {
                     //console.log(bridgeid, username)
                     if (username !== "") {
@@ -183,7 +190,7 @@ Page {
                 anchors.left: idLabel.left
                 anchors.right: bridgeBusyIndicator.left
                 anchors.top: parent.verticalCenter
-                text: "IP: " + address
+                text: qsTr("Address") + ": " + (address ? address : thisBridgeConfig.lastAddress)
                 color: highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 truncationMode: TruncationMode.Elide
             }

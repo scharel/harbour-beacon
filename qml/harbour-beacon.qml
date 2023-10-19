@@ -53,7 +53,9 @@ ApplicationWindow {
 
     ConfigurationGroup {
         id: bridgeConfig
+        path: appSettings.path + "/bridges/" + appSettings.lastUsedBridge
         property string username
+        property string lastAddress
     }
 
     property var roomArchetypeImages: {

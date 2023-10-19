@@ -82,6 +82,7 @@ QMap<int, QVariant> HueDiscovery::itemData(const QModelIndex &index) const {
 }
 */
 int HueDiscovery::discover(const QString& query, int pollInterval) {
+    m_discoveredBridges.clear();
     int queryId = -1;
     qDebug() << "Starting discovery for" << query;
     if (m_socket < 0) {
@@ -96,6 +97,10 @@ int HueDiscovery::discover(const QString& query, int pollInterval) {
     return queryId;
 }
 
+void HueDiscovery::addBridge(const QString& bridgeid, const QString &address) {
+    addBridge(bridgeid, address, false);
+}
+
 void HueDiscovery::clearBridges(const QList<int> &keep) {
     qDebug() << keep;
     emit beginResetModel();
@@ -106,6 +111,7 @@ void HueDiscovery::clearBridges(const QList<int> &keep) {
             m_pendingBridges.removeAt(i);
         }
     }
+    m_discoveredBridges.clear();
     emit endResetModel();
 }
 
@@ -167,23 +173,28 @@ int HueDiscovery::recvCallback(int sock, const struct sockaddr *from, size_t add
             QByteArray sbuf(NI_MAXSERV, '\0');
             getnameinfo(from, (socklen_t)addrlen, hbuf.data(), NI_MAXHOST, sbuf.data(), NI_MAXSERV, NI_NUMERICSERV | NI_NUMERICHOST);;
             QString address(hbuf);
-            HueDiscovery::getInstance().addBridge(txt["bridgeid"].toUpper(), address, sbuf.toUInt(), txt["modelid"]);
+            HueDiscovery::getInstance().addBridge(txt["bridgeid"].toUpper(), address, true, sbuf.toUInt(), txt["modelid"]);
         }
     }
     return 0;
 }
 
-void HueDiscovery::addBridge(const QString &bridgeid, const QString &address, ushort port, const QString &modelid) {
+void HueDiscovery::addBridge(const QString &bridgeid, const QString &address, bool discovered, ushort port, const QString &modelid) {
     if (!bridgeid.isEmpty() && !address.isEmpty()) {
-        bool isNewBridge = true;
-        for (int i = 0; i < m_pendingBridges.size() && isNewBridge; ++i) {
-            isNewBridge = m_pendingBridges[i]->bridgeid() != bridgeid;
-            if (!isNewBridge) {
-                m_pendingBridges[i]->setAddress(QHostAddress(address));
-                m_pendingBridges[i]->setPort(port);
+        if (m_discoveredBridges.contains(bridgeid)) {
+            int bridgeIndex = -1;
+            for (int i = 0; i < m_pendingBridges.size() && bridgeIndex< 0; ++i) {
+                if (m_pendingBridges[i]->bridgeid() == bridgeid) {
+                    bridgeIndex = i;
+                    m_pendingBridges[i]->setAddress(QHostAddress(address));
+                    m_pendingBridges[i]->setPort(port);
+                }
             }
         }
-        if (isNewBridge) {
+        else {
+            if (discovered) {
+                m_discoveredBridges << bridgeid;
+            }
             beginInsertRows(QModelIndex(), m_pendingBridges.size(), m_pendingBridges.size());
             HueBridge* bridge = new HueBridge(bridgeid, modelid, this);
             connect(bridge, SIGNAL(propertyChanged(int)), this, SLOT(bridgePropertyChanged(int)));

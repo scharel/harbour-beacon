@@ -34,6 +34,10 @@
         <source>Pull down to add bridges</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectBridgePage</name>

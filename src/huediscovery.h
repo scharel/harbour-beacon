@@ -19,6 +19,7 @@ class HueDiscovery : public QAbstractListModel
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // TODO implement Q_PROPERTY(QStringList discoveredBridges READ discoveredBridges NOTIFY discoveredBridgesChanged)
 public:
     explicit HueDiscovery(QObject *parent = nullptr);
     ~HueDiscovery();
@@ -36,6 +37,7 @@ public:
 
     Q_INVOKABLE HueBridge* bridge(int index = 0) const;
     Q_INVOKABLE int discover(const QString& query = HUE_MDNS, int pollIntercal = 100);
+    Q_INVOKABLE void addBridge(const QString& bridgeid, const QString& address);
     Q_INVOKABLE void clearBridges(const QList<int>& keep = QList<int>());
 
     bool busy() const { return m_socket >= 0; }
@@ -48,7 +50,7 @@ protected slots:
     void bridgePropertyChanged(int role);
 
 protected:
-    void addBridge(const QString& bridgeid, const QString& address, ushort port = 443, const QString& modelid = "");
+    void addBridge(const QString& bridgeid, const QString& address, bool discovered, ushort port = 443, const QString& modelid = "");
 
 signals:
     //void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
@@ -70,6 +72,7 @@ private:
                             size_t record_length, void *user_data);
 
     QList<HueBridge*> m_pendingBridges;
+    QList<QString> m_discoveredBridges;
 };
 
 #endif // HUEDISCOVERY_H
