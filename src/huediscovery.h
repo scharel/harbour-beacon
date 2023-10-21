@@ -50,7 +50,7 @@ protected slots:
     void bridgePropertyChanged(int role);
 
 protected:
-    void addBridge(const QString& bridgeid, const QString& address, bool discovered, ushort port = 443, const QString& modelid = "");
+    void addDiscoveredBridge(const QString& bridgeid, const QString& address, ushort port = 443, const QString& modelid = "");
 
 signals:
     //void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
@@ -72,7 +72,6 @@ private:
                             size_t record_length, void *user_data);
 
     QList<HueBridge*> m_pendingBridges;
-    QList<QString> m_discoveredBridges;
 };
 
 #endif // HUEDISCOVERY_H

@@ -132,6 +132,7 @@ Page {
             id: bridge
             height: Theme.itemSizeLarge
 
+            enabled: bridgeid !== appSettings.lastUsedBridge || ready
 
             Component.onCompleted: {
                 HueDiscovery.bridge(index).getConfig()
