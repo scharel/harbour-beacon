@@ -33,9 +33,17 @@ Page {
                 automaticCheck: false
                 checked: grouped_light.rdata.on.on
                 onCheckedChanged: busy = false
-                onClicked: {
+                function toggleGroup() {
                     busy = true
                     bridge.putResource(HueBridge.ResourceGroupedLight, { on: { on: !grouped_light.rdata.on.on } }, grouped_light.rid)
+                }
+                onClicked: {
+                    if (appSettings.remorseSetting > 1 && grouped_light.rdata.on.on) {
+                        Remorse.popupAction(page, group_owner.rdata.metadata.name + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout*1000 )
+                    }
+                    else {
+                        toggleGroup()
+                    }
                 }
             }
 
@@ -101,6 +109,7 @@ Page {
             Repeater {
                 model: group_owner.rdata.children
                 delegate: LightListItem {
+                    id: lightItem
                     width: parent.width
                     property string rid: group_owner.rdata.children[index].rid
                     property string rtype: group_owner.rdata.children[index].rtype
@@ -118,7 +127,6 @@ Page {
                             light = bridge.resource(HueBridge.ResourceLight, rid)
                         }
                     }
-                    onClicked: pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
                     onOnChanged: bridge.setLight(light.rid, { on: { on: on } })
                     onBrightnessChanged: bridge.setLight(light.rid, { on: { on: true }, dimming: { brightness: brightness } })
                 }

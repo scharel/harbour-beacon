@@ -4,10 +4,12 @@ import harbour.beacon 1.0
 import "../js/hue-colors.js" as Color
 
 ListItem {
+    id: lightItem
     property ResourceObject light: null
     contentHeight: Theme.itemSizeMedium
     signal onChanged(bool on)
     signal brightnessChanged(int brightness)
+    onClicked: pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
     onPressAndHold: openMenu()
     Switch {
         id: lightSwitch
@@ -16,9 +18,17 @@ ListItem {
         automaticCheck: false
         checked: light.rdata.on.on
         onCheckedChanged: busy = false
-        onClicked: {
+        function toggleLight() {
             busy = true
             onChanged(!light.rdata.on.on)
+        }
+        onClicked: {
+            if (appSettings.remorseSetting > 2 && light.rdata.on.on) {
+                Remorse.itemAction(lightItem, light.rdata.metadata.name + " " + qsTr("off"), function() { toggleLight() }, appSettings.remorseTimeout*1000 )
+            }
+            else {
+                toggleLight()
+            }
         }
     }
     Label {

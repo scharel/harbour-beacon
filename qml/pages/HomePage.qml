@@ -56,15 +56,23 @@ Page {
                 automaticCheck: false
                 checked: homeGroup.rdata.on.on   //homeGroup != null && typeof(homeGroup.data) !== "undefined" && typeof(homeGroup.data.on) !== "undefined" ? homeGroup.data.on.on : false
                 onCheckedChanged: busy = false
-                onClicked: {
+                function toggleHome() {
                     busy = true
                     bridge.setGroup(homeGroup.rid, { on: { on: !homeGroup.rdata.on.on } })
+                }
+                onClicked: {
+                    if (appSettings.remorseSetting > 0 && homeGroup.rdata.on.on) {
+                        Remorse.popupAction(page, qsTr("Home off"), function() { toggleHome() }, appSettings.remorseTimeout*1000 )
+                    }
+                    else {
+                        toggleHome()
+                    }
                 }
             }
         }
 
         delegate: ListItem {
-            id: listItem
+            id: groupItem
             contentHeight: Theme.itemSizeMedium
             width: parent.width
             //visible: resource.owner.rtype !== "bridge_home"
@@ -112,9 +120,17 @@ Page {
                 automaticCheck: false
                 checked: resource.on.on
                 onCheckedChanged: busy = false
-                onClicked: {
+                function toggleGroup() {
                     busy = true
                     bridge.setGroup(rid, { on: { on: !resource.on.on } })
+                }
+                onClicked: {
+                    if (appSettings.remorseSetting > 1 && resource.on.on) {
+                        Remorse.itemAction(groupItem, groupLabel.text + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout*1000 )
+                    }
+                    else {
+                        toggleGroup()
+                    }
                 }
             }
             Icon {

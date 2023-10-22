@@ -49,6 +49,8 @@ ApplicationWindow {
         property string lastUsedBridge: value("lastUsedBridge", "", String)
         property var groupSorting: value("groupSorting", /^room$/, RegExp)
         property var groupOrder: value("groupOrder", Array(), Array)
+        property int remorseSetting: value("remorseSetting", 0, Number)
+        property int remorseTimeout: value("remorseTimeout", 4, Number)
     }
 
     ConfigurationGroup {

@@ -133,6 +133,10 @@
         <source>Lights</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HomePage</name>
@@ -172,6 +176,21 @@
         <source>Zones</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Home off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LightListItem</name>
+    <message>
+        <source>off</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LightPage</name>
@@ -200,6 +219,38 @@
     </message>
     <message>
         <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a remorse timer when turning off devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home and groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All groups and devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remorse timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remorse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn off remorse</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

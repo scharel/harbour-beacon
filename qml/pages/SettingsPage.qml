@@ -45,6 +45,32 @@ Page {
                     onClicked: pageStack.push(Qt.resolvedUrl("DevicesPage.qml"))
                 }
             }
+            SectionHeader {
+                text: qsTr("Remorse")
+            }
+            ComboBox {
+                label: qsTr("Turn off remorse")
+                description: qsTr("Show a remorse timer when turning off devices")
+                currentIndex: appSettings.remorseSetting
+                onCurrentIndexChanged: appSettings.remorseSetting = currentIndex
+
+                menu: ContextMenu {
+                    MenuItem { text: qsTr("None") }                     // == 0
+                    MenuItem { text: qsTr("Home only") }                // > 0
+                    MenuItem { text: qsTr("Home and groups") }          // > 1
+                    MenuItem { text: qsTr("All groups and devices") }   // > 2
+                }
+            }
+            Slider {
+                width: parent.width
+                label: qsTr("Remorse timeout")
+                minimumValue: 1
+                maximumValue: 10
+                stepSize: 1
+                value: appSettings.remorseTimeout
+                valueText: value + "s"
+                onValueChanged: appSettings.remorseTimeout = value
+            }
         }
     }
 }
