@@ -9,7 +9,7 @@ ListItem {
     contentHeight: Theme.itemSizeMedium
     signal onChanged(bool on)
     signal brightnessChanged(int brightness)
-    onClicked: pageStack.push(Qt.resolvedUrl("LightPage.qml"), { device: device, light: light } )
+    onClicked: pageStack.push(Qt.resolvedUrl("../pages/LightPage.qml"), { device: device, light: light } )
     onPressAndHold: openMenu()
     Switch {
         id: lightSwitch
