@@ -1,9 +1,16 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
+import Nemo.Configuration 1.0
 import harbour.beacon 1.0
 
 Page {
     id: page
+
+    ConfigurationValue {
+        id: timeoutConfig
+        key: appSettings.path + "/remorseTimeout"
+        defaultValue: [4, 2, 2]
+    }
 
     SilicaFlickable {
         anchors.fill: parent
@@ -49,27 +56,51 @@ Page {
                 text: qsTr("Remorse")
             }
             ComboBox {
-                label: qsTr("Turn off remorse")
-                description: qsTr("Show a remorse timer when turning off devices")
+                id: remorseComboBox
+                property var remorseGroups: [
+                    qsTr("Home only"),              // > 0
+                    qsTr("Home and groups"),        // > 1
+                    qsTr("All groups and devices")  // > 2
+                ]
+                label: qsTr("Power off remorse")
+                description: qsTr("Show a remorse timer when powering off devices")
                 currentIndex: appSettings.remorseSetting
                 onCurrentIndexChanged: appSettings.remorseSetting = currentIndex
 
                 menu: ContextMenu {
-                    MenuItem { text: qsTr("None") }                     // == 0
-                    MenuItem { text: qsTr("Home only") }                // > 0
-                    MenuItem { text: qsTr("Home and groups") }          // > 1
-                    MenuItem { text: qsTr("All groups and devices") }   // > 2
+                    MenuItem { text: qsTr("None") }
+                    Repeater {
+                        model: remorseComboBox.remorseGroups
+                        delegate: MenuItem { text: modelData }
+                    }
                 }
             }
-            Slider {
-                width: parent.width
-                label: qsTr("Remorse timeout")
-                minimumValue: 1
-                maximumValue: 10
-                stepSize: 1
-                value: appSettings.remorseTimeout
-                valueText: value + "s"
-                onValueChanged: appSettings.remorseTimeout = value
+            Repeater {
+                id: remorseSliders
+                property var remorseSliderNames: [
+                    qsTr("Home"),
+                    qsTr("Groups"),
+                    qsTr("Devices")
+                ]
+                model: remorseSliderNames
+                delegate: Slider {
+                    width: parent.width
+                    opacity: index < appSettings.remorseSetting ? 1.0 : 0.0
+                    Behavior on opacity { FadeAnimator {} }
+                    label: qsTr("%1 timeout").arg(modelData)
+                    minimumValue: 1
+                    maximumValue: 10
+                    stepSize: 1
+                    Component.onCompleted: {
+                        value = timeoutConfig.value[index]
+                    }
+                    valueText: value + "s"
+                    onValueChanged: {
+                        var timeouts = timeoutConfig.value
+                        timeouts[index] = value.toFixed()
+                        timeoutConfig.value = timeouts
+                    }
+                }
             }
         }
     }

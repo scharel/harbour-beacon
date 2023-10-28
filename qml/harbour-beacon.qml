@@ -50,7 +50,7 @@ ApplicationWindow {
         property var groupSorting: value("groupSorting", /^room$/, RegExp)
         property var groupOrder: value("groupOrder", Array(), Array)
         property int remorseSetting: value("remorseSetting", 0, Number)
-        property int remorseTimeout: value("remorseTimeout", 4, Number)
+        property var remorseTimeout: value("remorseTimeout", Array(4, 2, 2), Array)
     }
 
     ConfigurationGroup {

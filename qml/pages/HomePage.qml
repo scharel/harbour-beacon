@@ -62,7 +62,7 @@ Page {
                 }
                 onClicked: {
                     if (appSettings.remorseSetting > 0 && homeGroup.rdata.on.on) {
-                        Remorse.popupAction(page, qsTr("Home off"), function() { toggleHome() }, appSettings.remorseTimeout*1000 )
+                        Remorse.popupAction(page, qsTr("Home off"), function() { toggleHome() }, appSettings.remorseTimeout[0]*1000 )
                     }
                     else {
                         toggleHome()
@@ -126,7 +126,7 @@ Page {
                 }
                 onClicked: {
                     if (appSettings.remorseSetting > 1 && resource.on.on) {
-                        Remorse.itemAction(groupItem, groupLabel.text + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout*1000 )
+                        Remorse.itemAction(groupItem, groupLabel.text + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout[1]*1000 )
                     }
                     else {
                         toggleGroup()

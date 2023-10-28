@@ -222,11 +222,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show a remorse timer when turning off devices</source>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None</source>
+        <source>Remorse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -242,15 +242,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remorse timeout</source>
+        <source>Power off remorse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remorse</source>
+        <source>Show a remorse timer when powering off devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Turn off remorse</source>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 timeout</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

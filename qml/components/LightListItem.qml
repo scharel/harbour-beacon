@@ -24,7 +24,7 @@ ListItem {
         }
         onClicked: {
             if (appSettings.remorseSetting > 2 && light.rdata.on.on) {
-                Remorse.itemAction(lightItem, light.rdata.metadata.name + " " + qsTr("off"), function() { toggleLight() }, appSettings.remorseTimeout*1000 )
+                Remorse.itemAction(lightItem, light.rdata.metadata.name + " " + qsTr("off"), function() { toggleLight() }, appSettings.remorseTimeout[2]*1000 )
             }
             else {
                 toggleLight()

@@ -39,7 +39,7 @@ Page {
                 }
                 onClicked: {
                     if (appSettings.remorseSetting > 1 && grouped_light.rdata.on.on) {
-                        Remorse.popupAction(page, group_owner.rdata.metadata.name + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout*1000 )
+                        Remorse.popupAction(page, group_owner.rdata.metadata.name + " " + qsTr("off"), function() { toggleGroup() }, appSettings.remorseTimeout[1]*1000 )
                     }
                     else {
                         toggleGroup()
