@@ -1,6 +1,8 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+//import Nemo.Notifications 1.0
+//import Nemo.DBus 2.0
 import harbour.beacon 1.0
 import "pages"
 
@@ -21,6 +23,7 @@ ApplicationWindow {
             bridge.startEventStream()
             appSettings.lastUsedBridge = bridge.bridgeid
             pageStack.replaceAbove(null, Qt.resolvedUrl("pages/HomePage.qml"))
+            //notification.publish()
         }
         else {
             bridgeConfig.path = ""
@@ -59,6 +62,16 @@ ApplicationWindow {
         property string username
         property string lastAddress
     }
+
+    /*Notification {
+        id: notification
+        appName: "Beacon"
+        appIcon: "harbour-beacon"
+        summary: "Home"
+        body: "Power home on or off"
+        onClicked: bridge.setGroup(homeGroup.rid, { on: { on: true } })
+        onClosed: bridge.setGroup(homeGroup.rid, { on: { on: flase } })
+    }*/
 
     property var roomArchetypeImages: {
         "living_room": "roomsLiving.svg",

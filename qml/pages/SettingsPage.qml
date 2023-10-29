@@ -32,6 +32,9 @@ Page {
                 id: pageHeader
                 title: qsTr("Settings")
             }
+            SectionHeader {
+                text: qsTr("Devices")
+            }
             ButtonLayout {
                 Button {
                     id: bridgesButton
