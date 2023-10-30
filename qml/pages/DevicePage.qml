@@ -10,7 +10,8 @@ Dialog {
     property string archeType: device.rdata.metadata.archetype
 
     Column {
-        width: parent.width
+        anchors.fill: parent
+        spacing: Theme.paddingLarge
 
         DialogHeader {}
 
@@ -37,43 +38,53 @@ Dialog {
                 text: name
                 label: qsTr("Name")
             }
-
         }
 
-        Item {
-            width: parent.width
-            height: Theme.itemSizeMedium
-        }
         Separator {
             width: parent.width
             color: Theme.secondaryColor
             horizontalAlignment: Qt.AlignHCenter
         }
-        Item {
+
+        Column {
+            id: detailsColumn
             width: parent.width
-            height: Theme.itemSizeMedium
+            DetailItem {
+                label: qsTr("Product")
+                value: device.rdata.product_data.product_name
+            }
+            DetailItem {
+                label: qsTr("Manufacturer")
+                value: device.rdata.product_data.manufacturer_name
+            }
+            DetailItem {
+                label: qsTr("Model")
+                value: device.rdata.product_data.model_id
+            }
+            DetailItem {
+                label: qsTr("Hardwareplatform")
+                value: device.rdata.product_data.hardware_platform_type
+            }
+            DetailItem {
+                label: qsTr("Software")
+                value: device.rdata.product_data.software_version
+            }
         }
 
-        DetailItem {
-            label: qsTr("Product")
-            value: device.rdata.product_data.product_name
-        }
-        DetailItem {
-            label: qsTr("Manufacturer")
-            value: device.rdata.product_data.manufacturer_name
-        }
-        DetailItem {
-            label: qsTr("Model")
-            value: device.rdata.product_data.model_id
-        }
-        DetailItem {
-            label: qsTr("Hardwareplatform")
-            value: device.rdata.product_data.hardware_platform_type
-        }
-        DetailItem {
-            label: qsTr("Software")
-            value: device.rdata.product_data.software_version
-        }
+//        SilicaFlickable {
+//            visible: debug
+//            width: parent.width
+//            anchors.top: detailsColumn.bottom
+//            height: Theme.itemSizeExtraLarge
+//            contentHeight: rawText.height
+//            TextArea {
+//                id: rawText
+//                readOnly: true
+//                label: qsTr("Raw data")
+//                font.pixelSize: Theme.fontSizeSmall
+//                text: JSON.stringify(device.rdata)
+//            }
+//        }
     }
 
     onDone: {
