@@ -4,7 +4,7 @@
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 
-#include "resourceobject.h"
+#include "resourceobjects/resourceobject.h"
 
 class ResourceSortFilterProxyModel : public QSortFilterProxyModel {
     Q_OBJECT

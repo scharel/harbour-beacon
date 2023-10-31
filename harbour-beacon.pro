@@ -30,8 +30,9 @@ HEADERS += \
     src/huediscovery.h \
     src/mdns/mdns.h \
     src/resourcemodel.h \
-    src/resourceobject.h \
-#    src/test/testbridge.h
+ \#    src/test/testbridge.h
+    src/resourceobjects/lightobject.h \
+    src/resourceobjects/resourceobject.h
 
 DISTFILES += qml/harbour-beacon.qml \
     LICENSE \

@@ -38,34 +38,33 @@ public:
         return rid() == other.rid();
     }
 
-    bool updateData(const QJsonObject& rdata) {
-        if (rdata["id"] == m_rdata["id"]) {// && rdata["type"] == m_rdata["type"]) {
-            if (rdata != m_rdata) {
-                //qDebug() << data;
-                QJsonObject::const_iterator i = rdata.constBegin();
-                while (i != rdata.constEnd()) {
-                    m_rdata[i.key()] = i.value();
-                    i++;
-                }
-                emit rdataChanged(m_rdata);
-            }
-            return true;
+    Q_INVOKABLE const QVariant value(const QStringList& keys) const {
+        QJsonValue value = m_rdata;
+        for (int i = 0; i < keys.size(); ++i) {
+            value = value.toObject().value(keys.at(i));
         }
-        return false;
+        return value;
     }
 
     const QString rid() const { return m_rdata["id"].toString(); }
     const QString rtype() const { return m_rdata["type"].toString(); }
     const QJsonObject& rdata() const { return m_rdata; }
 
+public slots:
+    void updateData(const QJsonObject& rdata) {
+        if (rdata != m_rdata) {
+            m_rdata = rdata;
+            emit rdataChanged(m_rdata);
+        }
+    }
+
 signals:
     void ridChanged(const QString& rid);
     void rtypeChanged(const QString& rtype);
     void rdataChanged(const QJsonObject& rdata);
 
-private:
+protected:
     QJsonObject m_rdata;
-
 };
 
 #endif // RESOURCEOBJECT_H

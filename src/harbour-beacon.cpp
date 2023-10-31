@@ -11,7 +11,8 @@
     #include "huebridge.h"
 #endif
 #include "resourcemodel.h"
-#include "resourceobject.h"
+#include "resourceobjects/resourceobject.h"
+#include "resourceobjects/lightobject.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,6 +35,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ResourceSortFilterProxyModel>("harbour.beacon", 1, 0, "ResourceModel");
     //qmlRegisterType<ResourceModel>("harbour.beacon", 1, 0, "ResourceModel");
     qmlRegisterType<ResourceObject>("harbour.beacon", 1, 0, "ResourceObject");
+    qmlRegisterType<LightObject>("harbour.beacon", 1, 0, "LightObject");
 
     QQuickView* view = SailfishApp::createView();
 #ifdef QT_DEBUG
